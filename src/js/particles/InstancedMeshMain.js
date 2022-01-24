@@ -50,8 +50,9 @@ function hdrLoaded() {
   scene.background = new THREE.Color(0x000000);
   scene.fog = new THREE.Fog(0x000000, 75, 150);
 
-  camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.0001, 1000);
-  camera.position.z = 75;
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight);
+  camera.position.x = -15;
+  camera.position.z = 15;
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
@@ -92,7 +93,7 @@ function hdrLoaded() {
 
   // floor
   const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(200, 200),
+    new THREE.PlaneGeometry(500, 500),
     new THREE.MeshPhongMaterial({ color: 0x3b475f, depthWrite: false })
   );
   floor.rotation.x = -Math.PI / 2;
@@ -138,13 +139,13 @@ function animate() {
   emitter.z += emitterSpeed.z;
 
   if (emitter.x > bounds.x || emitter.x < -bounds.x) {
-    emitterSpeed.x *= emitterSpeed.x - 1;
+    emitterSpeed.x *= - 1;
   }
   if (emitter.y > bounds.y || emitter.y < -bounds.y) {
-    emitterSpeed.y *= emitterSpeed.y - 1;
+    emitterSpeed.y *= - 1;
   }
   if (emitter.z > bounds.z || emitter.z < -bounds.z) {
-    emitterSpeed.z *= emitterSpeed.z - 1;
+    emitterSpeed.z *= - 1;
   }
 
   const delta = clock.getDelta() * 10;
