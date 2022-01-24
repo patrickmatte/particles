@@ -23,7 +23,7 @@ let renderer,
 
 export function InstancedMeshMain() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(1);
+  renderer.setPixelRatio(window.devicePixelRatio || 1);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
   renderer.shadowMap.enabled = true;

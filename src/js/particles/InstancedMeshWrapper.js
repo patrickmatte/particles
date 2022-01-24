@@ -133,7 +133,6 @@ export default class InstancedMeshWrapper {
     mesh.count = maxCount;
     mesh.frustumCulled = false;
     mesh.customDepthMaterial = depthMat;
-    mesh.customDistanceMaterial = depthMat;
     for (let i = 0; i < maxCount; i++) {
       this.dummy.position.x += 1;
       mesh.setMatrixAt(i, this.dummy.matrix);
