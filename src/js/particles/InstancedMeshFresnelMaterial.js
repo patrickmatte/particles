@@ -1,10 +1,13 @@
 import * as THREE from 'three';
 import InstancedMeshSandardMaterial from './InstancedMeshSandardMaterial';
 import { glsl } from '../tsunami/three/threeUtils';
+import easeSineIn from '../../../node_modules/three-bas/src/glsl/ease_sine_in.glsl';
+import easeCircIn from '../../../node_modules/three-bas/src/glsl/ease_circ_in.glsl';
 
 export default class InstancedMeshFresnelMaterial extends InstancedMeshSandardMaterial {
   constructor(parameters, simulation) {
     super(parameters, simulation);
+    console.log(easeSineIn);
   }
 
   onBeforeCompile(shader) {
@@ -17,6 +20,9 @@ export default class InstancedMeshFresnelMaterial extends InstancedMeshSandardMa
       #include <common>
       varying vec3 vNN;
       varying vec3 vEye;
+
+      ${easeSineIn}
+      ${easeCircIn}
     `;
     shader.vertexShader = shader.vertexShader.replace(token, insert);
     shader.fragmentShader = shader.fragmentShader.replace(token, insert);
@@ -41,7 +47,7 @@ export default class InstancedMeshFresnelMaterial extends InstancedMeshSandardMa
     insert = glsl`
     #include <dithering_fragment>
     float fresnelTerm =  ( -min(dot(vEye, normalize(vNN) ), 0.0) );
-    gl_FragColor.a = fresnelTerm;
+    gl_FragColor.a = easeCircIn(fresnelTerm);
     `;
     shader.fragmentShader = shader.fragmentShader.replace(token, insert);
   }
