@@ -12,21 +12,19 @@ export default class InstancedMeshWrapper {
     const geometry = new THREE.IcosahedronBufferGeometry(0.5, 3);
 
     const instanceColors = [];
-    for (let i = 0; i < maxCount; i++) {
-      instanceColors.push(Math.random() * 0.5 + 0.5);
-      instanceColors.push(Math.random() * 0.5 + 0.5);
-      instanceColors.push(Math.random() * 0.5 + 0.5);
-    }
-    geometry.setAttribute('instanceColor', new THREE.InstancedBufferAttribute(new Float32Array(instanceColors), 3));
-
     const textureUV = [];
     for (let j = 0; j < this.simulation.height; j++) {
       for (let i = 0; i < this.simulation.width; i++) {
         textureUV.push(i / (this.simulation.width - 1));
         textureUV.push(j / (this.simulation.height - 1));
+
+        instanceColors.push(Math.random() * 0.5 + 0.5);
+        instanceColors.push(Math.random() * 0.5 + 0.5);
+        instanceColors.push(Math.random() * 0.5 + 0.5);
       }
     }
     geometry.setAttribute('textureUV', new THREE.InstancedBufferAttribute(new Float32Array(textureUV), 2));
+    geometry.setAttribute('instanceColor', new THREE.InstancedBufferAttribute(new Float32Array(instanceColors), 3));
 
     const material = new InstancedMeshSandardMaterial(
       {
