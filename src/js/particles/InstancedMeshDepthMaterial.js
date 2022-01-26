@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import parabola from '../tsunami/three/shaders/parabola.glsl';
 
 export default class InstancedMeshDepthMaterial extends THREE.ShaderMaterial {
   constructor(parameters) {
@@ -7,15 +8,10 @@ export default class InstancedMeshDepthMaterial extends THREE.ShaderMaterial {
 
     const vertex_common = `
     #include <common>
-    attribute vec3 instanceColor;
-    attribute vec2 textureUV;
-    uniform float ratio;
-    uniform sampler2D pointTexture;
     uniform sampler2D sim;
+    attribute vec2 textureUV;
 
-    float parabola( float x, float k ) {
-        return pow( 4.0 * x * ( 1.0 - x ), k );
-    }
+    ${parabola}
     `;
 
     const begin_vertex = `
@@ -34,7 +30,5 @@ export default class InstancedMeshDepthMaterial extends THREE.ShaderMaterial {
       fragmentShader: depthFS,
     });
     this.uniforms.sim = { value: parameters.simulation.texturePos.texture };
-    this.uniforms.width = { value: parameters.simulation.width };
-    this.uniforms.height = { value: parameters.simulation.height };
   }
 }

@@ -68,14 +68,14 @@ function hdrLoaded() {
   const simSize = 32;
   simulation = new Simulation(renderer, simSize, simSize);
 
-  simulation.targets.forEach((target, i) => {
-    const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(2, 2),
-      new THREE.MeshBasicMaterial({ map: target.texture, side: THREE.DoubleSide })
-    );
-    plane.position.x = i * 6 - 3;
-    scene.add(plane);
-  });
+  // simulation.targets.forEach((target, i) => {
+  //   const plane = new THREE.Mesh(
+  //     new THREE.PlaneGeometry(2, 2),
+  //     new THREE.MeshBasicMaterial({ map: target.texture, side: THREE.DoubleSide })
+  //   );
+  //   plane.position.x = i * 6 - 3;
+  //   scene.add(plane);
+  // });
 
   particles = new WrapperInstancedMesh({
     simulation,

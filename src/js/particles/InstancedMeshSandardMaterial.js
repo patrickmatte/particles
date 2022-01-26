@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import parabola from '../tsunami/three/shaders/parabola.glsl';
 
 export default class InstancedMeshSandardMaterial extends THREE.MeshStandardMaterial {
   constructor(parameters, simulation) {
@@ -8,24 +9,16 @@ export default class InstancedMeshSandardMaterial extends THREE.MeshStandardMate
   }
 
   onBeforeCompile(shader) {
-    console.log('InstancedMeshSandardMaterial.onBeforeCompile');
-
     shader.uniforms.sim = { value: this.simulation.texturePos.texture };
-    shader.uniforms.width = { value: this.simulation.width };
-    shader.uniforms.height = { value: this.simulation.height };
 
     const vertex_common = `
     #include <common>
-    attribute vec3 instanceColor;
-    attribute vec2 textureUV;
-    uniform float ratio;
-    uniform sampler2D pointTexture;
     uniform sampler2D sim;
+    attribute vec2 textureUV;
+    attribute vec3 instanceColor;
     varying vec3 vInstanceColor;
 
-    float parabola( float x, float k ) {
-        return pow( 4.0 * x * ( 1.0 - x ), k );
-    }
+    ${parabola}
     `;
 
     const begin_vertex = `
