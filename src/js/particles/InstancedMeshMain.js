@@ -23,7 +23,7 @@ let renderer,
 
 export function InstancedMeshMain() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  renderer.setPixelRatio(1);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
   renderer.shadowMap.enabled = true;
@@ -64,7 +64,7 @@ function hdrLoaded() {
   emitter.z = Math.random() * bounds.z - bounds.z / 2;
   emitterSpeed = new THREE.Vector3(0.071, 0.078, 0.069);
 
-  const simSize = 64;
+  const simSize = 32;
   simulation = new Simulation(renderer, simSize, simSize);
 
   particles = new WrapperInstancedMesh({
@@ -139,13 +139,13 @@ function animate() {
   emitter.z += emitterSpeed.z;
 
   if (emitter.x > bounds.x || emitter.x < -bounds.x) {
-    emitterSpeed.x *= - 1;
+    emitterSpeed.x *= -1;
   }
   if (emitter.y > bounds.y || emitter.y < -bounds.y) {
-    emitterSpeed.y *= - 1;
+    emitterSpeed.y *= -1;
   }
   if (emitter.z > bounds.z || emitter.z < -bounds.z) {
-    emitterSpeed.z *= - 1;
+    emitterSpeed.z *= -1;
   }
 
   const delta = clock.getDelta() * 10;

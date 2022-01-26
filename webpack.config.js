@@ -56,6 +56,19 @@ module.exports = (env, argv) => {
         </script>
       `,
     },
+    {
+      template: pageTemplate,
+      title: 'fresnel',
+      filename: 'fresnel.html',
+      class: 'fresnel',
+      head: ``,
+      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
+      body: `
+        <script>
+          window.Cloud();
+        </script>
+      `,
+    },
   ];
 
   let links = '<ul>';

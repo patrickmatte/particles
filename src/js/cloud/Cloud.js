@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
-import FresnelMaterial from './FresnelMaterial';
+import BallMaterial from './BallMaterial';
+import BallShadowMaterial from './BallShadowMaterial';
 
 let camera, scene, renderer, stats, pmremGenerator, envMap, gui, mixer;
 const clock = new THREE.Clock();
@@ -52,13 +53,14 @@ export default function Cloud() {
 
   // scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
-  const mesh = new THREE.Mesh(
+  // floor
+  const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(2000, 2000),
     new THREE.MeshPhongMaterial({ color: 0x3b475f, depthWrite: false })
   );
-  mesh.rotation.x = -Math.PI / 2;
-  mesh.receiveShadow = true;
-  scene.add(mesh);
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  scene.add(floor);
 
   const grid = new THREE.GridHelper(2000, 20, 0x000000, 0x000000);
   grid.material.opacity = 0.2;
@@ -67,14 +69,36 @@ export default function Cloud() {
 
   const sphereGeo = new THREE.SphereBufferGeometry(25);
 
-  // const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xff00ff });
-  const sphereMaterial = new FresnelMaterial({ color: 0xff00ff });
+  const sphereMaterial = new BallMaterial({
+    color: 0x0000ff,
+    transparent: true,
+    metalness: 0,
+    roughness: 1,
+  });
 
-  const sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
-  sphere.castShadow = true;
-  sphere.receiveShadow = true;
-  sphere.position.y = 50;
-  scene.add(sphere);
+  // const sphere = new THREE.Mesh(sphereGeo, sphereMaterial);
+  // sphere.castShadow = true;
+  // sphere.receiveShadow = true;
+  // sphere.position.y = 50;
+  // scene.add(sphere);
+
+  const maxCount = 2;
+
+  const mesh = new THREE.InstancedMesh(sphereGeo, sphereMaterial, maxCount);
+  mesh.castShadow = mesh.receiveShadow = true;
+  mesh.count = maxCount;
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  mesh.frustumCulled = false;
+  mesh.customDepthMaterial = this.depthMat;
+  const dummy = new THREE.Object3D();
+  for (let i = 0; i < maxCount; i++) {
+    dummy.position.set(0, 50 * (i + 1), 0);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(i, dummy.matrix);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+
+  scene.add(mesh);
 
   window.addEventListener('resize', onWindowResize);
 

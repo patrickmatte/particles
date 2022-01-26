@@ -25,7 +25,6 @@ export default class Simulation {
     }
 
     var isAppleDevice = navigator.userAgent.match(/iPhone|iPad|iPod/i);
-
     var floatType = isAppleDevice ? THREE.HalfFloatType : THREE.FloatType;
 
     this.texture = new THREE.DataTexture(
@@ -33,7 +32,7 @@ export default class Simulation {
       this.width,
       this.height,
       THREE.RGBAFormat,
-      THREE.FloatType,
+      floatType,
       THREE.Texture.DEFAULT_MAPPING,
       THREE.ClampToEdgeWrapping,
       THREE.ClampToEdgeWrapping,
@@ -46,7 +45,7 @@ export default class Simulation {
     this.texture.magFilter = THREE.NearestFilter;
     this.texture.needsUpdate = true;
 
-    this.rtTexturePos = new THREE.WebGLRenderTarget(this.width, this.height, {
+    this.texturePos = new THREE.WebGLRenderTarget(this.width, this.height, {
       wrapS: THREE.ClampToEdgeWrapping,
       wrapT: THREE.ClampToEdgeWrapping,
       minFilter: THREE.NearestFilter,
@@ -57,7 +56,7 @@ export default class Simulation {
       depthBuffer: false,
     });
 
-    this.targets = [this.rtTexturePos, this.rtTexturePos.clone()];
+    this.targets = [this.texturePos, this.texturePos.clone()];
 
     this.shader = new THREE.ShaderMaterial({
       uniforms: {
@@ -75,8 +74,8 @@ export default class Simulation {
       side: THREE.DoubleSide,
     });
 
-    this.rtScene = new THREE.Scene();
-    this.rtCamera = new THREE.OrthographicCamera(
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.OrthographicCamera(
       -this.width / 2,
       this.width / 2,
       -this.height / 2,
@@ -84,21 +83,21 @@ export default class Simulation {
       -500,
       1000
     );
-    this.rtQuad = new THREE.Mesh(new THREE.PlaneBufferGeometry(this.width, this.height), this.shader);
-    this.rtScene.add(this.rtQuad);
+    this.quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(this.width, this.height), this.shader);
+    this.scene.add(this.quad);
 
-    this.renderer.setRenderTarget(this.rtTexturePos);
+    this.renderer.setRenderTarget(this.texturePos);
 
-    this.renderer.render(this.rtScene, this.rtCamera);
+    this.renderer.render(this.scene, this.camera);
 
     /*
 	this.plane = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10 ), new THREE.MeshBasicMaterial( { map: this.targets[0].texture, side: THREE.DoubleSide } ) );
 	this.plane.position.x = -6;
-	scene.add( this.plane );
+	debugScene.add( this.plane );
 
 	this.plane = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10 ), new THREE.MeshBasicMaterial( { map: this.targets[1].texture, side: THREE.DoubleSide } ) );
 	this.plane.position.x = 6;
-	scene.add( this.plane );
+	debugScene.add( this.plane );
 */
   }
 
@@ -111,7 +110,7 @@ export default class Simulation {
 
     this.renderer.setRenderTarget(this.targets[this.targetPos]);
 
-    this.renderer.render(this.rtScene, this.rtCamera);
+    this.renderer.render(this.scene, this.camera);
   }
 }
 
@@ -147,9 +146,6 @@ void main() {
 
 	float s = vUv.x * life / 100.0;
 	float speedInc = 1.0;
-	if( s > 0.95 ) speedInc = 0.75;
-	else if( s > 0.9 ) speedInc = 0.85;
-	else speedInc = 1.0;
 
 	vec3 v = factor * speedInc * delta * speed * ( curlNoise( 0.2 * pos + factor * evolution * 0.1 * timer ) );
 	pos += v;
