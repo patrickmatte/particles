@@ -8,17 +8,10 @@ export default class InstancedMeshDepthMaterial extends THREE.ShaderMaterial {
     const vertex_common = `
     #include <common>
     attribute vec3 instanceColor;
-    attribute vec3 pos;
-
-    uniform float size;
-
+    attribute vec2 textureUV;
     uniform float ratio;
     uniform sampler2D pointTexture;
     uniform sampler2D sim;
-    attribute vec3 simPosition;
-    uniform float width;
-    uniform float height;
-    attribute float randomSize;
 
     float parabola( float x, float k ) {
         return pow( 4.0 * x * ( 1.0 - x ), k );
@@ -26,20 +19,11 @@ export default class InstancedMeshDepthMaterial extends THREE.ShaderMaterial {
     `;
 
     const begin_vertex = `
-    vec2 dimensions = vec2( width, height );
-	float px = simPosition.y;
-	float vi = simPosition.z;
-	float x = mod( px, dimensions.x );
-	float y = mod( floor( px / dimensions.x ), dimensions.y );
-	vec2 uv = vec2( x, y ) / dimensions;
-
-	vec4 cubePosition = texture2D( sim, uv );
-	float alpha = cubePosition.a / 100.;
-	float timeScale = parabola( 1.0 - alpha, 1.0 );
-
-	vec3 modPos = cubePosition.xyz * 1.0;
+    vec4 texturePos = texture2D( sim, textureUV );
+    float alpha = texturePos.a / 100.;
+    float timeScale = parabola( 1.0 - alpha, 1.0 );
     
-    vec3 transformed = position * timeScale + modPos;
+    vec3 transformed = position * timeScale + texturePos.xyz;
     `;
 
     depthVS = depthVS.replace('#include <common>', vertex_common);

@@ -24,6 +24,7 @@ let renderer,
 export function InstancedMeshMain() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(1);
+  renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
   renderer.shadowMap.enabled = true;
@@ -47,8 +48,8 @@ function hdrLoaded() {
   };
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x000000);
-  scene.fog = new THREE.Fog(0x000000, 75, 150);
+  scene.background = new THREE.Color(0x3b475f);
+  scene.fog = new THREE.Fog(0x3b475f, 0, 100);
 
   camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight);
   camera.position.x = -15;
@@ -67,6 +68,15 @@ function hdrLoaded() {
   const simSize = 32;
   simulation = new Simulation(renderer, simSize, simSize);
 
+  simulation.targets.forEach((target, i) => {
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      new THREE.MeshBasicMaterial({ map: target.texture, side: THREE.DoubleSide })
+    );
+    plane.position.x = i * 6 - 3;
+    scene.add(plane);
+  });
+
   particles = new WrapperInstancedMesh({
     simulation,
     envMap,
@@ -74,11 +84,11 @@ function hdrLoaded() {
 
   scene.add(particles.mesh);
 
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x3b475f, 0.33);
   hemiLight.position.set(0, 200, 0);
   scene.add(hemiLight);
 
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1);
   dirLight.position.set(0, 200, 100);
   dirLight.castShadow = true;
   dirLight.shadow.camera.top = 40;
@@ -94,7 +104,7 @@ function hdrLoaded() {
   // floor
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(500, 500),
-    new THREE.MeshPhongMaterial({ color: 0x3b475f, depthWrite: false })
+    new THREE.MeshStandardMaterial({ color: 0x3b475f, depthWrite: false })
   );
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -12;

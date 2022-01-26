@@ -9,19 +9,20 @@ export default class Simulation {
     this.renderer = renderer;
     this.targetPos = 0;
 
-    this.data = new Float32Array(this.width * this.height * 4);
+    const maxCount = this.width * this.height;
 
-    var r = 1;
-    for (var i = 0, l = this.width * this.height; i < l; i++) {
+    this.data = new Float32Array(maxCount * 4);
+
+    for (var i = 0; i < maxCount; i++) {
       var phi = Math.random() * 2 * Math.PI;
       var costheta = Math.random() * 2 - 1;
       var theta = Math.acos(costheta);
-      r = 0.85 + 0.15 * Math.random();
+      const r = 0.85 + 0.15 * Math.random();
 
       this.data[i * 4] = r * Math.sin(theta) * Math.cos(phi);
       this.data[i * 4 + 1] = r * Math.sin(theta) * Math.sin(phi);
       this.data[i * 4 + 2] = r * Math.cos(theta);
-      this.data[i * 4 + 3] = Math.random() * 100; // frames life
+      this.data[i * 4 + 3] = (i / (maxCount - 1)) * 100; // frames life
     }
 
     var isAppleDevice = navigator.userAgent.match(/iPhone|iPad|iPod/i);
@@ -89,16 +90,6 @@ export default class Simulation {
     this.renderer.setRenderTarget(this.texturePos);
 
     this.renderer.render(this.scene, this.camera);
-
-    /*
-	this.plane = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10 ), new THREE.MeshBasicMaterial( { map: this.targets[0].texture, side: THREE.DoubleSide } ) );
-	this.plane.position.x = -6;
-	debugScene.add( this.plane );
-
-	this.plane = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10 ), new THREE.MeshBasicMaterial( { map: this.targets[1].texture, side: THREE.DoubleSide } ) );
-	this.plane.position.x = 6;
-	debugScene.add( this.plane );
-*/
   }
 
   render(time, delta) {

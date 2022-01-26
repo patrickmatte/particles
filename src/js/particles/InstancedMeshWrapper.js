@@ -19,32 +19,18 @@ export default class InstancedMeshWrapper {
     }
     geometry.setAttribute('instanceColor', new THREE.InstancedBufferAttribute(new Float32Array(instanceColors), 3));
 
-    const pos = [];
-    for (let i = 0; i < maxCount; i++) {
-      pos.push(Math.random() * 2 - 1);
-      pos.push(Math.random() * 2 - 1);
-      pos.push(Math.random() * 2 - 1);
+    const textureUV = [];
+    for (let j = 0; j < this.simulation.height; j++) {
+      for (let i = 0; i < this.simulation.width; i++) {
+        textureUV.push(i / (this.simulation.width - 1));
+        textureUV.push(j / (this.simulation.height - 1));
+      }
     }
-    geometry.setAttribute('pos', new THREE.InstancedBufferAttribute(new Float32Array(pos), 3));
+    geometry.setAttribute('textureUV', new THREE.InstancedBufferAttribute(new Float32Array(textureUV), 2));
 
-    var positionsLength = maxCount * 3;
-    var positions = new Float32Array(positionsLength);
-    var randomSize = new Float32Array(maxCount);
-    var p = 0;
-    for (var j = 0; j < positionsLength; j += 3) {
-      positions[j] = p;
-      positions[j + 1] = p / 5;
-      positions[j + 2] = p;
-      randomSize[p] = 1;
-      p++;
-    }
-
-    geometry.setAttribute('simPosition', new THREE.InstancedBufferAttribute(positions, 3));
-    geometry.setAttribute('randomSize', new THREE.InstancedBufferAttribute(randomSize, 1));
-
-    const material = new InstancedMeshFresnelMaterial(
+    const material = new InstancedMeshSandardMaterial(
       {
-        roughness: 0.5,
+        roughness: 1,
         metalness: 0,
         color: 0xff0000,
         transparent: true,
