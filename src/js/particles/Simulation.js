@@ -3,7 +3,7 @@ import noise from '../tsunami/three/shaders/noise.glsl';
 import curlNoise from '../tsunami/three/shaders/curlNoise.glsl';
 
 export default class Simulation {
-  constructor(renderer, width, height) {
+  constructor(renderer, offset, width, height) {
     this.width = width;
     this.height = height;
     this.renderer = renderer;
@@ -17,7 +17,7 @@ export default class Simulation {
       var phi = Math.random() * 2 * Math.PI;
       var costheta = Math.random() * 2 - 1;
       var theta = Math.acos(costheta);
-      const r = 0.85 + 0.15 * Math.random();
+      const r = 0.75 + 0.75 * Math.random();
 
       this.data[i * 4] = r * Math.sin(theta) * Math.cos(phi);
       this.data[i * 4 + 1] = r * Math.sin(theta) * Math.sin(phi);
@@ -65,7 +65,7 @@ export default class Simulation {
         tPositions: { type: 't', value: this.texture },
         timer: { type: 'f', value: 0 },
         delta: { type: 'f', value: 0 },
-        offset: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
+        offset: { type: 'v3', value: offset },
         factor: { type: 'f', value: 0.2 },
         frequency: { type: 'f', value: 0.185 },
         amplitude: { type: 'f', value: 0.01 },
@@ -140,6 +140,7 @@ void main() {
 	float s = vUv.x * life / 100.0;
 
   
+  // vec3 v = curlNoise(pos * frequency + timer * speed) * amplitude;
   vec3 v = curlNoise(pos * frequency + timer * speed) * amplitude;
 	// vec3 v = factor * delta * speed * ( curlNoise( 0.2 * pos + factor * frequency * 0.1 * timer ) );
 	pos += v;

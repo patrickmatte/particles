@@ -1,19 +1,17 @@
 import * as THREE from 'three';
+import parabola from '../tsunami/three/shaders/parabola.glsl';
 
 export default class PointsWrapper {
   constructor(options) {
     this.simulation = options.simulation;
-    this.pointTexture = options.particuleTexture;
-    this.position = options.position;
+    this.pointTexture = options.pointTexture;
 
     this.material = new THREE.ShaderMaterial({
       uniforms: {
-        size: { type: 'f', value: 75 },
+        size: { type: 'f', value: 1 },
         ratio: { type: 'f', value: 1 },
         pointTexture: { type: 't', value: this.pointTexture },
         sim: { type: 't', value: this.simulation.rtTexturePos },
-        width: { type: 'f', value: this.simulation.width },
-        height: { type: 'f', value: this.simulation.height },
       },
       vertexShader: pointsVertex,
       fragmentShader: pointsFragment,
@@ -22,22 +20,28 @@ export default class PointsWrapper {
       depthWrite: false,
     });
 
-    var vertices = Math.round(this.simulation.width * this.simulation.height);
-    var positionsLength = vertices * 3;
-    var positions = new Float32Array(positionsLength);
-    var randomSize = new Float32Array(vertices);
-    var p = 0;
-    for (var j = 0; j < positionsLength; j += 3) {
-      positions[j] = p;
-      positions[j + 1] = p / 5;
-      positions[j + 2] = p;
-      randomSize[p] = 1; //tsunami.easing.Exponential.easeIn(Math.random() * 0.85 + 0.15, 0, 1, 1);
-      p++;
-    }
+    const position = [];
+    const instanceColor = [];
+    const textureUV = [];
+    for (let j = 0; j < this.simulation.height; j++) {
+      for (let i = 0; i < this.simulation.width; i++) {
+        textureUV.push(i / (this.simulation.width - 1));
+        textureUV.push(j / (this.simulation.height - 1));
 
+        instanceColor.push(Math.random() * 0.25 + 0.75);
+        instanceColor.push(Math.random() * 0.25 + 0.05);
+        instanceColor.push(Math.random() * 0.25 + 0.15);
+
+        position.push(0);
+        position.push(0);
+        position.push(0);
+      }
+    }
     var geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('randomSize', new THREE.BufferAttribute(randomSize, 1));
+
+    geometry.setAttribute('textureUV', new THREE.BufferAttribute(new Float32Array(textureUV), 2));
+    geometry.setAttribute('instanceColor', new THREE.BufferAttribute(new Float32Array(instanceColor), 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(position), 3));
 
     this.mesh = new THREE.Points(geometry, this.material);
   }
@@ -48,44 +52,32 @@ uniform float size;
 uniform float ratio;
 uniform sampler2D pointTexture;
 uniform sampler2D sim;
-uniform float width;
-uniform float height;
 
-attribute float randomSize;
+attribute vec2 textureUV;
+attribute vec3 instanceColor;
+varying vec3 vInstanceColor;
 
-varying float alpha;
-
-float parabola( float x, float k ) {
-	return pow( 4. * x * ( 1. - x ), k );
-}
+${parabola}
 
 void main() {
-	vec2 dimensions = vec2( width, height );
+  vInstanceColor = instanceColor;
 
-	float px = position.y;
-	float vi = position.z;
-	float x = mod( px, dimensions.x );
-	float y = mod( floor( px / dimensions.x ), dimensions.y );
-	vec2 uv = vec2( x, y ) / dimensions;
+  vec4 texturePos = texture2D( sim, textureUV );
+  float alpha = texturePos.a / 100.;
+  float timeScale = parabola( 1.0 - alpha, 1.0 );
 
-	vec4 cubePosition = texture2D( sim, uv );
-	alpha = cubePosition.a / 100.;
-	float timeScale = .025 * parabola( 1. - alpha, 1. );
-
-	vec3 modPos = cubePosition.xyz * 1.0;
-
-	vec4 mvPosition = modelViewMatrix * vec4(modPos, 1.);
-	gl_PointSize = size * timeScale * ( ratio / length( mvPosition.xyz ) );
+	vec4 mvPosition = modelViewMatrix * vec4(texturePos.xyz, 1.);
+	gl_PointSize = size * timeScale * ( ratio / length( mvPosition.xyz ) ) * alpha;
 	gl_Position = projectionMatrix * mvPosition;
 }
 `;
 
 export const pointsFragment = `
 uniform sampler2D pointTexture;
-varying float alpha;
+varying vec3 vInstanceColor;
 
 void main() {
 	vec4 color = texture2D( pointTexture, gl_PointCoord );
-	gl_FragColor = vec4(color.rgb, color.a * alpha);
+	gl_FragColor = vec4(color.rgb * vInstanceColor, color.a);
 }
 `;

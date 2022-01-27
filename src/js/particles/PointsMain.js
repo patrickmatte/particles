@@ -5,7 +5,7 @@ import { getRect } from '../tsunami/window';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
 
-let renderer, params, scene, camera, controls, bounds, emitter, emitterSpeed, simulation, particles, gui, clock;
+let renderer, scene, camera, controls, bounds, emitter, emitterSpeed, simulation, particles, gui, clock;
 
 export function PointsMain() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -13,18 +13,13 @@ export function PointsMain() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  params = {
-    factor: 0.33,
-    evolution: 1.0,
-    speed: 0.5,
-  };
-
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x000000);
   scene.fog = new THREE.Fog(0x000000, 75, 150);
 
-  camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.0001, 1000);
-  camera.position.z = 75;
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight);
+  camera.position.x = -20;
+  camera.position.z = 20;
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
@@ -34,33 +29,41 @@ export function PointsMain() {
   emitter.x = Math.random() * bounds.x - bounds.x / 2;
   emitter.y = Math.random() * bounds.y - bounds.y / 2;
   emitter.z = Math.random() * bounds.z - bounds.z / 2;
-  emitterSpeed = new THREE.Vector3(0.071, 0.078, 0.069);
+  emitterSpeed = new THREE.Vector3(0.071, 0.078, 0.125);
 
-  const simSize = 64;
-  simulation = new Simulation(renderer, simSize, simSize);
+  const simSize = 128;
+  simulation = new Simulation(renderer, emitter, simSize, simSize);
 
-  const particuleTexture = new THREE.TextureLoader().load('assets/particles/particle-color.png');
+  const pointTexture = new THREE.TextureLoader().load('assets/particles/particle-color.png');
 
   particles = new PointsWrapper({
     simulation,
-    particuleTexture,
+    pointTexture,
   });
 
   scene.add(particles.mesh);
 
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x3b475f, 0.33);
   hemiLight.position.set(0, 200, 0);
   scene.add(hemiLight);
 
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1);
   dirLight.position.set(0, 200, 100);
+  dirLight.castShadow = true;
+  dirLight.shadow.camera.top = 40;
+  dirLight.shadow.camera.bottom = -40;
+  dirLight.shadow.camera.left = -40;
+  dirLight.shadow.camera.right = 40;
+  dirLight.shadow.mapSize.width = 2048;
+  dirLight.shadow.mapSize.height = 2048;
+  // light.shadow.camera.far = 20;
 
   scene.add(dirLight);
 
   // floor
   const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(200, 200),
-    new THREE.MeshPhongMaterial({ color: 0x3b475f, depthWrite: false })
+    new THREE.PlaneGeometry(500, 500),
+    new THREE.MeshStandardMaterial({ color: 0x3b475f, depthWrite: false })
   );
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -12;
@@ -69,17 +72,14 @@ export function PointsMain() {
 
   // gui
   gui = new GUI();
-  gui.add(params, 'factor', 0.1, 3).onChange((value) => {
-    simulation.shader.uniforms.factor.value = value;
-  });
-  gui.add(params, 'evolution', 0, 1).onChange((value) => {
-    simulation.shader.uniforms.evolution.value = value;
-  });
-  gui.add(params, 'speed', 0, 3).onChange((value) => {
-    simulation.shader.uniforms.speed.value = value;
-  });
-  gui.add(hemiLight, 'intensity', 0, 1, 0.01).name('hemiLight intensity');
-  gui.add(dirLight, 'intensity', 0, 1, 0.01).name('dirLight intensity');
+  gui.add(simulation.shader.uniforms.factor, 'value', 0, 1, 0.001).name('life factor');
+  const noiseFolder = gui.addFolder('curl noise');
+  noiseFolder.add(simulation.shader.uniforms.frequency, 'value', 0.02, 0.3, 0.001).name('frequency');
+  noiseFolder.add(simulation.shader.uniforms.amplitude, 'value', 0, 0.1, 0.001).name('amplitude');
+  noiseFolder.add(simulation.shader.uniforms.speed, 'value', 0, 1, 0.001).name('speed');
+  const lightsFolder = gui.addFolder('lights');
+  lightsFolder.add(hemiLight, 'intensity', 0, 1, 0.01).name('hemi');
+  lightsFolder.add(dirLight, 'intensity', 0, 1, 0.01).name('directional');
 
   window.addEventListener('resize', onWindowResize, false);
 
@@ -102,9 +102,7 @@ function onWindowResize() {
 }
 
 function animate() {
-  emitter.x += emitterSpeed.x;
-  emitter.y += emitterSpeed.y;
-  emitter.z += emitterSpeed.z;
+  emitter.add(emitterSpeed);
 
   if (emitter.x > bounds.x || emitter.x < -bounds.x) {
     emitterSpeed.x *= emitterSpeed.x - 1;
@@ -119,7 +117,6 @@ function animate() {
   const delta = clock.getDelta() * 10;
   const time = clock.elapsedTime;
 
-  simulation.shader.uniforms.offset.value = emitter;
   simulation.render(time, delta);
 
   if (particles.material.uniforms) {

@@ -44,9 +44,9 @@ function hdrLoaded() {
   scene.background = new THREE.Color(0x3b475f);
   scene.fog = new THREE.Fog(0x3b475f, 0, 100);
 
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight);
-  camera.position.x = -15;
-  camera.position.z = 15;
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight);
+  camera.position.x = -20;
+  camera.position.z = 20;
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
@@ -56,10 +56,10 @@ function hdrLoaded() {
   emitter.x = Math.random() * bounds.x - bounds.x / 2;
   emitter.y = Math.random() * bounds.y - bounds.y / 2;
   emitter.z = Math.random() * bounds.z - bounds.z / 2;
-  emitterSpeed = new THREE.Vector3(0.071, 0.078, 0.069);
+  emitterSpeed = new THREE.Vector3(0.071, 0.078, 0.125);
 
   const simSize = 32;
-  simulation = new Simulation(renderer, simSize, simSize);
+  simulation = new Simulation(renderer, emitter, simSize, simSize);
 
   // simulation.targets.forEach((target, i) => {
   //   const plane = new THREE.Mesh(
@@ -134,9 +134,7 @@ function onWindowResize() {
 }
 
 function animate() {
-  emitter.x += emitterSpeed.x;
-  emitter.y += emitterSpeed.y;
-  emitter.z += emitterSpeed.z;
+  emitter.add(emitterSpeed);
 
   if (emitter.x > bounds.x || emitter.x < -bounds.x) {
     emitterSpeed.x *= -1;
@@ -151,7 +149,6 @@ function animate() {
   const delta = clock.getDelta() * 10;
   const time = clock.elapsedTime;
 
-  simulation.shader.uniforms.offset.value = emitter;
   simulation.render(time, delta);
 
   if (particles.material.uniforms) {
