@@ -140,7 +140,6 @@ void main() {
 	float s = vUv.x * life / 100.0;
 
   
-  // vec3 v = curlNoise(pos * frequency + timer * speed) * amplitude;
   vec3 v = curlNoise(pos * frequency + timer * speed) * amplitude;
 	// vec3 v = factor * delta * speed * ( curlNoise( 0.2 * pos + factor * frequency * 0.1 * timer ) );
 	pos += v;
