@@ -33,7 +33,7 @@ export function InstancedMeshMain() {
 
   pmremGenerator = new THREE.PMREMGenerator(renderer);
   pmremGenerator.compileEquirectangularShader();
-  new RGBELoader().setDataType(floatType).load(`assets/b515_IBL.hdr`, (t) => {
+  new RGBELoader().setDataType(floatType).load(`assets/studio_small_03_1k.hdr`, (t) => {
     envMap = pmremGenerator.fromEquirectangular(t).texture;
     hdrLoaded();
   });
@@ -58,7 +58,7 @@ function hdrLoaded() {
   emitter.z = Math.random() * bounds.z - bounds.z / 2;
   emitterSpeed = new THREE.Vector3(0.071, 0.078, 0.125);
 
-  const simSize = 32;
+  const simSize = 64;
   simulation = new Simulation(renderer, emitter, simSize, simSize);
 
   // simulation.targets.forEach((target, i) => {
@@ -100,7 +100,7 @@ function hdrLoaded() {
     new THREE.MeshStandardMaterial({ color: 0x3b475f, depthWrite: false })
   );
   floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -18;
+  floor.position.y = -20;
   floor.receiveShadow = true;
   scene.add(floor);
 

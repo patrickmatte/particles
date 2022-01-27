@@ -9,17 +9,34 @@ export default class InstancedMeshWrapper {
 
     const geometry = new THREE.IcosahedronBufferGeometry(0.5, 3);
 
-    const maxCount = this.simulation.width * this.simulation.height;
+    const colorRandomMultiplier = 0.25;
+    const colors = [
+      new THREE.Color(0xe4e9e3),
+      new THREE.Color(0x8a77ab),
+      new THREE.Color(0xdc8b37),
+      new THREE.Color(0x4d8c76),
+      new THREE.Color(0x6f9fc8),
+      new THREE.Color(0xd7afa8),
+    ];
+
     const instanceColor = [];
     const textureUV = [];
+    const maxCount = this.simulation.width * this.simulation.height;
+    let count = 0;
     for (let j = 0; j < this.simulation.height; j++) {
       for (let i = 0; i < this.simulation.width; i++) {
+        const factor = count / (maxCount - 1);
         textureUV.push(i / (this.simulation.width - 1));
         textureUV.push(j / (this.simulation.height - 1));
 
-        instanceColor.push(Math.random() * 0.25 + 0.75);
-        instanceColor.push(Math.random() * 0.25 + 0.05);
-        instanceColor.push(Math.random() * 0.25 + 0.15);
+        const colorIndex = Math.random();
+        const color = colors[Math.floor(factor * (colors.length - 1))];
+
+        instanceColor.push(Math.random() * colorRandomMultiplier + (color.r - colorRandomMultiplier));
+        instanceColor.push(Math.random() * colorRandomMultiplier + (color.g - colorRandomMultiplier));
+        instanceColor.push(Math.random() * colorRandomMultiplier + (color.b - colorRandomMultiplier));
+
+        count += 1;
       }
     }
     geometry.setAttribute('textureUV', new THREE.InstancedBufferAttribute(new Float32Array(textureUV), 2));

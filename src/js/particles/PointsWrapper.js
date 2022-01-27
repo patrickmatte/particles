@@ -20,6 +20,9 @@ export default class PointsWrapper {
       depthWrite: false,
     });
 
+    const colorRandomMultiplier = 0.25;
+    const color = new THREE.Vector3(1, 0.3, 0.4);
+
     const position = [];
     const instanceColor = [];
     const textureUV = [];
@@ -28,9 +31,9 @@ export default class PointsWrapper {
         textureUV.push(i / (this.simulation.width - 1));
         textureUV.push(j / (this.simulation.height - 1));
 
-        instanceColor.push(Math.random() * 0.25 + 0.75);
-        instanceColor.push(Math.random() * 0.25 + 0.05);
-        instanceColor.push(Math.random() * 0.25 + 0.15);
+        instanceColor.push(Math.random() * colorRandomMultiplier + (color.x - colorRandomMultiplier));
+        instanceColor.push(Math.random() * colorRandomMultiplier + (color.y - colorRandomMultiplier));
+        instanceColor.push(Math.random() * colorRandomMultiplier + (color.z - colorRandomMultiplier));
 
         position.push(0);
         position.push(0);
