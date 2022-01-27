@@ -65,10 +65,11 @@ export default class Simulation {
         tPositions: { type: 't', value: this.texture },
         timer: { type: 'f', value: 0 },
         delta: { type: 'f', value: 0 },
-        speed: { type: 'f', value: 0.5 },
         offset: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
-        factor: { type: 'f', value: 0.25 },
-        evolution: { type: 'f', value: 0.5 },
+        factor: { type: 'f', value: 0.2 },
+        frequency: { type: 'f', value: 0.185 },
+        amplitude: { type: 'f', value: 0.01 },
+        speed: { type: 'f', value: 0.1 },
       },
       vertexShader: simulationVertex,
       fragmentShader: simulationFragment,
@@ -128,7 +129,8 @@ uniform float timer;
 uniform float delta;
 uniform float speed;
 uniform float factor;
-uniform float evolution;
+uniform float amplitude;
+uniform float frequency;
 
 void main() {
 	vec4 c = texture2D( tPositions, vUv );
@@ -136,9 +138,10 @@ void main() {
 	float life = c.a;
 
 	float s = vUv.x * life / 100.0;
-	float speedInc = 1.0;
 
-	vec3 v = factor * speedInc * delta * speed * ( curlNoise( 0.2 * pos + factor * evolution * 0.1 * timer ) );
+  
+  vec3 v = curlNoise(pos * frequency + timer * speed) * amplitude;
+	// vec3 v = factor * delta * speed * ( curlNoise( 0.2 * pos + factor * frequency * 0.1 * timer ) );
 	pos += v;
 	life -= factor;
 

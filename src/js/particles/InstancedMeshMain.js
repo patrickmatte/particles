@@ -9,7 +9,6 @@ import GUI from 'lil-gui';
 let renderer,
   pmremGenerator,
   envMap,
-  params,
   scene,
   camera,
   controls,
@@ -41,12 +40,6 @@ export function InstancedMeshMain() {
 }
 
 function hdrLoaded() {
-  params = {
-    factor: 0.33,
-    evolution: 1.0,
-    speed: 0.5,
-  };
-
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x3b475f);
   scene.fog = new THREE.Fog(0x3b475f, 0, 100);
@@ -113,17 +106,14 @@ function hdrLoaded() {
 
   // gui
   gui = new GUI();
-  gui.add(params, 'factor', 0.1, 3).onChange((value) => {
-    simulation.shader.uniforms.factor.value = value;
-  });
-  gui.add(params, 'evolution', 0, 1).onChange((value) => {
-    simulation.shader.uniforms.evolution.value = value;
-  });
-  gui.add(params, 'speed', 0, 3).onChange((value) => {
-    simulation.shader.uniforms.speed.value = value;
-  });
-  gui.add(hemiLight, 'intensity', 0, 1, 0.01).name('hemiLight intensity');
-  gui.add(dirLight, 'intensity', 0, 1, 0.01).name('dirLight intensity');
+  gui.add(simulation.shader.uniforms.factor, 'value', 0, 1, 0.001).name('life factor');
+  const noiseFolder = gui.addFolder('curl noise');
+  noiseFolder.add(simulation.shader.uniforms.frequency, 'value', 0.02, 0.3, 0.001).name('frequency');
+  noiseFolder.add(simulation.shader.uniforms.amplitude, 'value', 0, 0.1, 0.001).name('amplitude');
+  noiseFolder.add(simulation.shader.uniforms.speed, 'value', 0, 1, 0.001).name('speed');
+  const lightsFolder = gui.addFolder('lights');
+  lightsFolder.add(hemiLight, 'intensity', 0, 1, 0.01).name('hemi');
+  lightsFolder.add(dirLight, 'intensity', 0, 1, 0.01).name('directional');
 
   window.addEventListener('resize', onWindowResize, false);
 

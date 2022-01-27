@@ -18,9 +18,9 @@ export default class InstancedMeshWrapper {
         textureUV.push(i / (this.simulation.width - 1));
         textureUV.push(j / (this.simulation.height - 1));
 
-        instanceColors.push(Math.random() * 0.5 + 0.5);
-        instanceColors.push(Math.random() * 0.5 + 0.5);
-        instanceColors.push(Math.random() * 0.5 + 0.5);
+        instanceColors.push(Math.random() * 0.25 + 0.75);
+        instanceColors.push(Math.random() * 0.25 + 0.05);
+        instanceColors.push(Math.random() * 0.25 + 0.15);
       }
     }
     geometry.setAttribute('textureUV', new THREE.InstancedBufferAttribute(new Float32Array(textureUV), 2));
@@ -28,7 +28,7 @@ export default class InstancedMeshWrapper {
 
     const material = new InstancedMeshSandardMaterial(
       {
-        roughness: 1,
+        roughness: 0,
         metalness: 0,
         color: 0xff0000,
         transparent: true,
