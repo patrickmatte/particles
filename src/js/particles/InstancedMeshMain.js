@@ -100,7 +100,7 @@ function hdrLoaded() {
     new THREE.MeshStandardMaterial({ color: 0x3b475f, depthWrite: false })
   );
   floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -12;
+  floor.position.y = -18;
   floor.receiveShadow = true;
   scene.add(floor);
 

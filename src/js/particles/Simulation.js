@@ -71,8 +71,8 @@ export default class Simulation {
         amplitude: { type: 'f', value: 0.01 },
         speed: { type: 'f', value: 0.1 },
       },
-      vertexShader: simulationVertex,
-      fragmentShader: simulationFragment,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
       side: THREE.DoubleSide,
     });
 
@@ -85,7 +85,9 @@ export default class Simulation {
       -500,
       1000
     );
-    this.quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(this.width, this.height), this.shader);
+
+    const geometry = new THREE.PlaneBufferGeometry(this.width, this.height);
+    this.quad = new THREE.Mesh(geometry, this.shader);
     this.scene.add(this.quad);
 
     this.renderer.setRenderTarget(this.texturePos);
@@ -106,7 +108,7 @@ export default class Simulation {
   }
 }
 
-export const simulationVertex = `
+export const vertexShader = `
 	varying vec2 vUv;
 
 	void main() {
@@ -115,7 +117,7 @@ export const simulationVertex = `
 	}
 `;
 
-export const simulationFragment = `
+export const fragmentShader = `
 ${noise}
 ${curlNoise}
 
@@ -139,7 +141,6 @@ void main() {
 
 	float s = vUv.x * life / 100.0;
 
-  
   vec3 v = curlNoise(pos * frequency + timer * speed) * amplitude;
 	// vec3 v = factor * delta * speed * ( curlNoise( 0.2 * pos + factor * frequency * 0.1 * timer ) );
 	pos += v;
