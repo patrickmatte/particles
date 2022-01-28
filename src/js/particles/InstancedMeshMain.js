@@ -40,9 +40,11 @@ export function InstancedMeshMain() {
 }
 
 function hdrLoaded() {
+  const bgColor = new THREE.Color(0x847080);
+
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x3b475f);
-  scene.fog = new THREE.Fog(0x3b475f, 0, 100);
+  scene.background = bgColor;
+  scene.fog = new THREE.Fog(bgColor, 0, 100);
 
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight);
   camera.position.x = -20;
@@ -77,7 +79,7 @@ function hdrLoaded() {
 
   scene.add(particles.mesh);
 
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x3b475f, 0.33);
+  const hemiLight = new THREE.HemisphereLight(0xffffff, bgColor, 0.33);
   hemiLight.position.set(0, 200, 0);
   scene.add(hemiLight);
 
@@ -97,7 +99,7 @@ function hdrLoaded() {
   // floor
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(500, 500),
-    new THREE.MeshStandardMaterial({ color: 0x3b475f, depthWrite: false })
+    new THREE.MeshStandardMaterial({ color: bgColor, depthWrite: false })
   );
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -20;

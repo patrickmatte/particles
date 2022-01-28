@@ -14,8 +14,8 @@ export function PointsMain() {
   document.body.appendChild(renderer.domElement);
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x000000);
-  scene.fog = new THREE.Fog(0x000000, 75, 150);
+  scene.background = new THREE.Color(0x3b475f);
+  scene.fog = new THREE.Fog(0x3b475f, 0, 100);
 
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight);
   camera.position.x = -20;
