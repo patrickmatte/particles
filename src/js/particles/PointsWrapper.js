@@ -1,24 +1,65 @@
 import * as THREE from 'three';
 import parabola from '../tsunami/three/shaders/parabola.glsl';
+import { glsl } from '../tsunami/three/threeUtils';
 
 export default class PointsWrapper {
   constructor(options) {
     this.simulation = options.simulation;
     this.pointTexture = options.pointTexture;
 
-    this.material = new THREE.ShaderMaterial({
-      uniforms: {
-        size: { type: 'f', value: 1 },
-        ratio: { type: 'f', value: 1 },
-        pointTexture: { type: 't', value: this.pointTexture },
-        sim: { type: 't', value: this.simulation.rtTexturePos },
-      },
-      vertexShader: pointsVertex,
-      fragmentShader: pointsFragment,
+    this.material = new THREE.PointsMaterial({
       transparent: true,
-      depthTest: false,
-      depthWrite: true,
+      size: devicePixelRatio,
+      sizeAttenuation: true,
+      map: this.pointTexture,
     });
+    this.material.onBeforeCompile = (shader) => {
+      shader.uniforms.ratio = { value: window.innerHeight };
+      shader.uniforms.sim = { value: this.simulation.texturePos.texture };
+
+      const common_vertex = glsl`
+      #include <common>
+      uniform float ratio;
+      uniform sampler2D sim;
+
+      attribute vec2 textureUV;
+      attribute vec3 instanceColor;
+      varying vec3 vInstanceColor;
+
+      ${parabola}
+      `;
+
+      const begin_vertex = glsl`
+        vec4 texturePos = texture2D( sim, textureUV );
+        vec3 transformed = vec3( texturePos.xyz );
+        float alpha = texturePos.a / 100.;
+        float timeScale = parabola( 1.0 - alpha, 1.0 );
+        vInstanceColor = instanceColor;
+      `;
+
+      const size_vertex = glsl`
+        gl_PointSize = size;
+      `;
+
+      shader.vertexShader = shader.vertexShader.replace('#include <common>', common_vertex);
+      shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', begin_vertex);
+      shader.vertexShader = shader.vertexShader.replace('gl_PointSize = size;', size_vertex);
+
+      const common_fragment = glsl`
+      #include <common>
+      varying vec3 vInstanceColor;
+      `;
+
+      const diffuse_fragment = `
+        vec4 diffuseColor = vec4(diffuse * vInstanceColor, opacity);
+      `;
+
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', common_fragment);
+      shader.fragmentShader = shader.fragmentShader.replace(
+        'vec4 diffuseColor = vec4( diffuse, opacity );',
+        diffuse_fragment
+      );
+    };
 
     const colorRandomMultiplier = 0.25;
     const colors = [
@@ -48,7 +89,7 @@ export default class PointsWrapper {
         instanceColor.push(Math.random() * colorRandomMultiplier + (color.g - colorRandomMultiplier));
         instanceColor.push(Math.random() * colorRandomMultiplier + (color.b - colorRandomMultiplier));
 
-        position.push(0);
+        position.push(i);
         position.push(0);
         position.push(0);
 
@@ -64,38 +105,3 @@ export default class PointsWrapper {
     this.mesh = new THREE.Points(geometry, this.material);
   }
 }
-
-export const pointsVertex = `
-uniform float size;
-uniform float ratio;
-uniform sampler2D pointTexture;
-uniform sampler2D sim;
-
-attribute vec2 textureUV;
-attribute vec3 instanceColor;
-varying vec3 vInstanceColor;
-
-${parabola}
-
-void main() {
-  vInstanceColor = instanceColor;
-
-  vec4 texturePos = texture2D( sim, textureUV );
-  float alpha = texturePos.a / 100.;
-  float timeScale = parabola( 1.0 - alpha, 1.0 );
-
-	vec4 mvPosition = modelViewMatrix * vec4(texturePos.xyz, 1.);
-	gl_PointSize = size * timeScale * ( ratio / length( mvPosition.xyz ) ) * alpha;
-	gl_Position = projectionMatrix * mvPosition;
-}
-`;
-
-export const pointsFragment = `
-uniform sampler2D pointTexture;
-varying vec3 vInstanceColor;
-
-void main() {
-	vec4 color = texture2D( pointTexture, gl_PointCoord );
-	gl_FragColor = vec4(color.rgb * vInstanceColor, color.a);
-}
-`;
