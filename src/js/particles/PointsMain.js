@@ -36,11 +36,11 @@ export function PointsMain() {
   const simSize = 128;
   simulation = new Simulation(renderer, emitter, simSize, simSize);
 
-  const pointTexture = new THREE.TextureLoader().load('assets/particles/particle-color.png');
+  const alphaMap = new THREE.TextureLoader().load('assets/particles/point-alpha-map.jpg');
 
   particles = new PointsWrapper({
     simulation,
-    pointTexture,
+    alphaMap,
   });
 
   scene.add(particles.mesh);

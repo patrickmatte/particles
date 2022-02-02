@@ -5,13 +5,14 @@ import { glsl } from '../tsunami/three/threeUtils';
 export default class PointsWrapper {
   constructor(options) {
     this.simulation = options.simulation;
-    this.pointTexture = options.pointTexture;
+    this.alphaMap = options.alphaMap;
 
     this.material = new THREE.PointsMaterial({
       transparent: true,
-      size: devicePixelRatio,
+      size: devicePixelRatio * 0.5,
       sizeAttenuation: true,
-      map: this.pointTexture,
+      alphaMap: this.alphaMap,
+      alphaTest: 0.5,
     });
     this.material.onBeforeCompile = (shader) => {
       shader.uniforms.ratio = { value: window.innerHeight };

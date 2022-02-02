@@ -19,6 +19,7 @@ let renderer,
   particles,
   gui,
   clock;
+const raycaster = new THREE.Raycaster();
 
 export function InstancedMeshMain() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -86,10 +87,10 @@ function hdrLoaded() {
   const dirLight = new THREE.DirectionalLight(0xffffff, 1);
   dirLight.position.set(0, 200, 100);
   dirLight.castShadow = true;
-  dirLight.shadow.camera.top = 40;
-  dirLight.shadow.camera.bottom = -40;
-  dirLight.shadow.camera.left = -40;
-  dirLight.shadow.camera.right = 40;
+  dirLight.shadow.camera.top = 20;
+  dirLight.shadow.camera.bottom = -20;
+  dirLight.shadow.camera.left = -20;
+  dirLight.shadow.camera.right = 20;
   dirLight.shadow.mapSize.width = 2048;
   dirLight.shadow.mapSize.height = 2048;
   // light.shadow.camera.far = 20;
@@ -104,7 +105,7 @@ function hdrLoaded() {
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -20;
   floor.receiveShadow = true;
-  scene.add(floor);
+  // scene.add(floor);
 
   // gui
   gui = new GUI();
@@ -124,6 +125,8 @@ function hdrLoaded() {
   clock = new THREE.Clock();
 
   animate();
+
+  document.addEventListener('click', clickHandler);
 }
 
 function onWindowResize() {
@@ -133,6 +136,25 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
 
   renderer.setSize(rect.width, rect.height);
+}
+
+function clickHandler(event) {
+  event.preventDefault();
+
+  console.log('geometry.attributes.position', particles.mesh.geometry.attributes.position);
+
+  const mouse = new THREE.Vector2(0, 0);
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersection = raycaster.intersectObject(particles.mesh);
+
+  if (intersection.length > 0) {
+    const instanceId = intersection[0].instanceId;
+    console.log('instanceId', instanceId);
+  }
 }
 
 function animate() {

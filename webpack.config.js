@@ -32,6 +32,19 @@ module.exports = (env, argv) => {
   const htmlFiles = [
     {
       template: pageTemplate,
+      title: 'particles cloud',
+      filename: 'particles-cloud.html',
+      class: 'particles cloud',
+      head: ``,
+      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
+      body: `
+        <script>
+          window.ParticlesCloud();
+        </script>
+      `,
+    },
+    {
+      template: pageTemplate,
       title: 'particles instanced',
       filename: 'particles-instanced.html',
       class: 'particles instanced',
@@ -66,6 +79,19 @@ module.exports = (env, argv) => {
       body: `
         <script>
           window.Cloud();
+        </script>
+      `,
+    },
+    {
+      template: pageTemplate,
+      title: 'datatest',
+      filename: 'datatest.html',
+      class: 'datatest',
+      head: ``,
+      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
+      body: `
+        <script>
+          window.DataTest();
         </script>
       `,
     },
@@ -132,7 +158,7 @@ module.exports = (env, argv) => {
           ],
         },
         {
-          test: /\.m?js$/,
+          test: /\.(js|jsx)$/,
           exclude: /(node_modules|bower_components)/,
           loader: 'babel-loader',
         },
@@ -147,6 +173,15 @@ module.exports = (env, argv) => {
         {
           test: /\.(svg|jpe?g|png|gif)(\?.*)?$/i,
           use: 'file-loader?name=img/[name].[ext]',
+        },
+        {
+          test: /\.csv$/,
+          loader: 'csv-loader',
+          options: {
+            dynamicTyping: true,
+            header: true,
+            skipEmptyLines: true,
+          },
         },
       ],
     },
