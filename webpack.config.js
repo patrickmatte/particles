@@ -49,7 +49,6 @@ module.exports = (env, argv) => {
       filename: 'particles-instanced.html',
       class: 'particles instanced',
       head: ``,
-      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
       body: `
         <script>
           window.MainInstanced();
@@ -62,7 +61,6 @@ module.exports = (env, argv) => {
       filename: 'particles.html',
       class: 'particles points',
       head: ``,
-      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
       body: `
         <script>
           window.MainPoints();
@@ -75,7 +73,6 @@ module.exports = (env, argv) => {
       filename: 'fresnel.html',
       class: 'fresnel',
       head: ``,
-      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
       body: `
         <script>
           window.Cloud();
@@ -88,10 +85,21 @@ module.exports = (env, argv) => {
       filename: 'datatest.html',
       class: 'datatest',
       head: ``,
-      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
       body: `
         <script>
           window.DataTest();
+        </script>
+      `,
+    },
+    {
+      template: pageTemplate,
+      title: 'raycast',
+      filename: 'raycast.html',
+      class: 'raycast',
+      head: ``,
+      body: `
+        <script>
+          window.RayCast();
         </script>
       `,
     },

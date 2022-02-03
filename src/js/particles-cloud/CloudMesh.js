@@ -15,14 +15,17 @@ export default class CloudMesh {
     const geometry = new THREE.IcosahedronBufferGeometry(0.25, 3);
 
     const colorRandomMultiplier = 0.25;
-    const colors = [
-      new THREE.Color(0xe4e9e3),
-      new THREE.Color(0x8a77ab),
-      new THREE.Color(0xdc8b37),
-      new THREE.Color(0x4d8c76),
-      new THREE.Color(0x6f9fc8),
-      new THREE.Color(0xd7afa8),
+
+    const hexColors = [
+      0x201923, 0xffffff, 0xfcff5d, 0x7dfc00, 0x0ec434, 0x228c68, 0x8ad8e8, 0x235b54, 0x29bdab, 0x3998f5, 0x37294f,
+      0x277da7, 0x3750db, 0xf22020, 0x991919, 0xffcba5, 0xe68f66, 0xc56133, 0x96341c, 0x632819, 0xffc413, 0xf47a22,
+      0x2f2aa0, 0xb732cc, 0x772b9d, 0xf07cab, 0xd30b94, 0xedeff3, 0xc3a5b4, 0x946aa2, 0x5d4c86,
     ];
+
+    const colors = [];
+    hexColors.forEach((hex) => {
+      colors.push(new THREE.Color(hex).offsetHSL(0, -0.33, 0));
+    });
 
     const instanceColor = [];
     const textureUV = [];

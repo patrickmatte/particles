@@ -1,16 +1,15 @@
 import * as THREE from 'three';
-import Simulation from './Simulation';
+import RayCastMesh from './RayCastMesh';
+import RayCastSim from './RayCastSim';
 import { getRect } from '../tsunami/window';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
-import CloudMesh from './CloudMesh';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
-let renderer, pmremGenerator, envMap, scene, camera, controls, simulation, particles, gui, stats;
+let renderer, scene, camera, controls, simulation, particles, gui, stats;
 const raycaster = new THREE.Raycaster();
 
-export function ParticlesCloud() {
+export function RayCast() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(1);
   renderer.outputEncoding = THREE.sRGBEncoding;
@@ -18,18 +17,6 @@ export function ParticlesCloud() {
   document.body.appendChild(renderer.domElement);
   renderer.shadowMap.enabled = true;
 
-  const isAppleDevice = navigator.userAgent.match(/iPhone|iPad|iPod/i);
-  const floatType = isAppleDevice ? THREE.HalfFloatType : THREE.FloatType;
-
-  pmremGenerator = new THREE.PMREMGenerator(renderer);
-  pmremGenerator.compileEquirectangularShader();
-  new RGBELoader().setDataType(floatType).load(`assets/studio_small_03_1k.hdr`, (t) => {
-    envMap = pmremGenerator.fromEquirectangular(t).texture;
-    hdrLoaded();
-  });
-}
-
-function hdrLoaded() {
   const bgColor = new THREE.Color(0x847080);
 
   scene = new THREE.Scene();
@@ -43,24 +30,19 @@ function hdrLoaded() {
   controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
 
-  const simSize = 64;
-  simulation = new Simulation(renderer, simSize, simSize);
+  simulation = new RayCastSim(renderer, 2, 2);
   simulation.addEventListener('change', () => {
     if (particles.material.uniforms) {
-      particles.material.uniforms.sim.value = simulation.targets[simulation.targetPos].texture;
-      particles.depthMat.uniforms.sim.value = simulation.targets[simulation.targetPos].texture;
+      particles.material.uniforms.sim.value = simulation.currentRenderTarget.texture;
+      particles.depthMat.uniforms.sim.value = simulation.currentRenderTarget.texture;
     }
   });
 
-  particles = new CloudMesh({
-    simulation,
-    envMap,
-  });
+  particles = new RayCastMesh(simulation);
+  scene.add(particles.mesh);
   particles.mesh.raycastOffsetBuffer = new Float32Array(
     simulation.currentRenderTarget.width * simulation.currentRenderTarget.height * 4
   );
-
-  scene.add(particles.mesh);
 
   const hemiLight = new THREE.HemisphereLight(0xffffff, bgColor, 0.33);
   hemiLight.position.set(0, 200, 0);
@@ -87,7 +69,7 @@ function hdrLoaded() {
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -20;
   floor.receiveShadow = true;
-  // scene.add(floor);
+  scene.add(floor);
 
   // gui
   gui = new GUI();
@@ -123,16 +105,26 @@ function onWindowResize() {
 function clickHandler(event) {
   event.preventDefault();
 
+  // console.log('geometry.attributes.position', particles.mesh.geometry.attributes.position);
+
   const mouse = new THREE.Vector2(0, 0);
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
   raycaster.setFromCamera(mouse, camera);
 
+  renderer.readRenderTargetPixels(
+    simulation.currentRenderTarget,
+    0,
+    0,
+    simulation.currentRenderTarget.width,
+    simulation.currentRenderTarget.height,
+    particles.mesh.raycastOffsetBuffer
+  );
   const intersection = raycaster.intersectObject(particles.mesh);
-
   if (intersection.length > 0) {
     const instanceId = intersection[0].instanceId;
+    console.log('instanceId', instanceId);
   }
 }
 
@@ -146,4 +138,4 @@ function animate(time) {
   stats.update();
 }
 
-window.ParticlesCloud = ParticlesCloud;
+window.RayCast = RayCast;

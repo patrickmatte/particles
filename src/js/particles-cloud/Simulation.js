@@ -78,9 +78,9 @@ export default class Simulation extends EventTarget {
         oPositions: { value: this.texture },
         tPositions: { value: this.texture },
         timer: { value: 0 },
-        noise0: { value: new THREE.Vector4(0.075, 6.204, 0.0, 1.0) },
-        noise1: { value: new THREE.Vector4(0.14, 1.624, 0.0, 1.0) },
-        noise2: { value: new THREE.Vector4(0.251, 1.231, 0.0, 1.0) },
+        noise0: { value: new THREE.Vector4(0.075, 4.241, 1.738, 1.0) },
+        noise1: { value: new THREE.Vector4(0.14, 1.362, 0.0, 1.0) },
+        noise2: { value: new THREE.Vector4(0.251, 0.708, 0.0, 1.0) },
         radius: { value: 8 },
       },
       vertexShader: vertexShader,
@@ -108,6 +108,10 @@ export default class Simulation extends EventTarget {
     this.renderer.setRenderTarget(this.texturePos);
 
     this.renderer.render(this.scene, this.camera);
+  }
+
+  get currentRenderTarget() {
+    return this.targets[this.targetPos];
   }
 
   render() {
@@ -139,6 +143,17 @@ export default class Simulation extends EventTarget {
         .onChange(this.render);
     }
     // noiseFolder.add(this.shader.uniforms.noise1.value, 'w', 0, 1, 0.001).name('speed').onChange(this.render);
+  }
+
+  addDebugPlanes(scene) {
+    this.targets.forEach((target, i) => {
+      const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(2, 2),
+        new THREE.MeshBasicMaterial({ map: target.texture, side: THREE.DoubleSide })
+      );
+      plane.position.x = i * 6 - 3;
+      scene.add(plane);
+    });
   }
 }
 
