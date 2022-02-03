@@ -50,9 +50,11 @@ export default class CloudMesh {
 
     const material = new CloudMeshMaterial(
       {
-        roughness: 0,
+        roughness: 0.4,
         metalness: 0,
         color: 0xff0000,
+        envMap,
+        envMapIntensity: 0.01,
       },
       this.textureSource
     );
@@ -79,6 +81,7 @@ export default class CloudMesh {
   GUI(gui) {
     gui.add(this.material, 'roughness', 0, 1, 0.001);
     gui.add(this.material, 'metalness', 0, 1, 0.001);
+    gui.add(this.material, 'envMapIntensity', 0, 1, 0.001);
     gui.add(this.mesh, 'castShadow');
     gui.add(this.mesh, 'receiveShadow');
   }

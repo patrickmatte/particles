@@ -45,7 +45,7 @@ export default class CloudMeshNoiseAnimation {
       uniforms: {
         textureSource: { value: textureSource },
         noise0: { value: new THREE.Vector3(0.042, 1.712, 0.031) },
-        noise1: { value: new THREE.Vector3(0.5, 0.351, 0.071) },
+        noise1: { value: new THREE.Vector3(0.5, 0.089, 0.071) },
         time: { value: 0 },
       },
       vertexShader: vertexShader,

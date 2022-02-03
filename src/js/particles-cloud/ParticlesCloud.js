@@ -47,8 +47,7 @@ function matChanger() {
 export function ParticlesCloud() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(1);
-  // renderer.outputEncoding = THREE.sRGBEncoding;
-  // renderer.gammaFactor = 2.2;
+  renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
   renderer.shadowMap.enabled = true;
@@ -124,7 +123,6 @@ function hdrLoaded() {
 
   // gui
   gui = new GUI();
-  gui.add(postprocessing, 'enabled').name('Depth of field');
 
   gui.close();
   const simulationFolder = gui.addFolder('Cloud');
@@ -183,6 +181,7 @@ function initPostprocessing() {
   postprocessing.bokeh = bokehPass;
 
   const dofFolder = gui.addFolder('DOF');
+  dofFolder.add(postprocessing, 'enabled').name('enabled');
   dofFolder.add(effectController, 'focus', 0, 100, 1).onChange(matChanger);
   dofFolder.add(effectController, 'aperture', 0, 200, 0.1).onChange(matChanger);
   dofFolder.add(effectController, 'maxblur', 0.0, 0.2, 0.0001).onChange(matChanger);
