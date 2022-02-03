@@ -105,8 +105,6 @@ function onWindowResize() {
 function clickHandler(event) {
   event.preventDefault();
 
-  // console.log('geometry.attributes.position', particles.mesh.geometry.attributes.position);
-
   const mouse = new THREE.Vector2(0, 0);
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;

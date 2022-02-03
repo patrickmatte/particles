@@ -142,7 +142,6 @@ export default class Simulation extends EventTarget {
         .name('time')
         .onChange(this.render);
     }
-    // noiseFolder.add(this.shader.uniforms.noise1.value, 'w', 0, 1, 0.001).name('speed').onChange(this.render);
   }
 
   addDebugPlanes(scene) {
@@ -163,12 +162,12 @@ attribute float randomRotation;
 attribute float index;
 
 varying vec2 vUv;
-varying float vrandomRadius;
+// varying float vrandomRadius;
 varying float vrandomRotation;
 varying float vindex;
 
 void main() {
-  vrandomRadius = randomRadius;
+  // vrandomRadius = randomRadius;
   vrandomRotation = randomRotation;
   vindex = index;
   vUv = vec2(uv.x, 1.0 - uv.y);
@@ -182,7 +181,7 @@ ${curlNoise}
 ${rotationsGLSL}
 
 varying vec2 vUv;
-varying float vrandomRadius;
+// varying float vrandomRadius;
 varying float vrandomRotation;
 varying float vindex;
 

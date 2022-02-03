@@ -1,16 +1,11 @@
 import * as THREE from 'three';
 import CloudMeshDepthMaterial from './CloudMeshDepthMaterial';
 import CloudMeshMaterial from './CloudMeshMaterial';
+import { InstancedMeshExtended } from './InstancedMeshExtended';
 
 export default class CloudMesh {
-  constructor(options) {
-    this.simulation = options.simulation;
-
-    this.noiseUniforms = {
-      noise0: { value: new THREE.Vector3(0.025, 0.8, 0.025) },
-      noise1: { value: new THREE.Vector3(0.3, 0.5, 0.025) },
-      time: { value: 0 },
-    };
+  constructor(textureSource, envMap) {
+    this.textureSource = { value: textureSource };
 
     const geometry = new THREE.IcosahedronBufferGeometry(0.25, 3);
 
@@ -27,15 +22,18 @@ export default class CloudMesh {
       colors.push(new THREE.Color(hex).offsetHSL(0, -0.33, 0));
     });
 
+    const width = this.textureSource.value.image.width;
+    const height = this.textureSource.value.image.height;
+
     const instanceColor = [];
     const textureUV = [];
-    const maxCount = this.simulation.width * this.simulation.height;
+    const maxCount = width * height;
     let count = 0;
-    for (let j = 0; j < this.simulation.height; j++) {
-      for (let i = 0; i < this.simulation.width; i++) {
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
         const factor = count / (maxCount - 1);
-        textureUV.push(i / (this.simulation.width - 1));
-        textureUV.push(j / (this.simulation.height - 1));
+        textureUV.push(i / (width - 1));
+        textureUV.push(j / (height - 1));
 
         const colorIndex = Math.random();
         const color = colors[Math.floor(factor * (colors.length - 1))];
@@ -55,16 +53,14 @@ export default class CloudMesh {
         roughness: 0,
         metalness: 0,
         color: 0xff0000,
-        transparent: true,
       },
-      this.simulation,
-      this.noiseUniforms
+      this.textureSource
     );
     this.material = material;
 
-    this.depthMat = new CloudMeshDepthMaterial(this.simulation, this.noiseUniforms);
+    this.depthMat = new CloudMeshDepthMaterial(this.textureSource);
 
-    const mesh = new THREE.InstancedMesh(geometry, material, maxCount);
+    const mesh = new InstancedMeshExtended(geometry, material, maxCount);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.count = maxCount;
@@ -80,21 +76,5 @@ export default class CloudMesh {
     this.mesh = mesh;
   }
 
-  GUI(gui) {
-    for (let i = 0; i < 2; i++) {
-      const noiseFolder = gui.addFolder('noise' + i);
-      noiseFolder
-        .add(this.noiseUniforms['noise' + i].value, 'x', 0, 0.5, 0.001)
-        .name('frequency')
-        .onChange(this.render);
-      noiseFolder
-        .add(this.noiseUniforms['noise' + i].value, 'y', 0, 2, 0.001)
-        .name('amplitude')
-        .onChange(this.render);
-      noiseFolder
-        .add(this.noiseUniforms['noise' + i].value, 'z', 0, 1, 0.001)
-        .name('speed')
-        .onChange(this.render);
-    }
-  }
+  GUI(gui) {}
 }

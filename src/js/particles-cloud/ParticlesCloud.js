@@ -6,8 +6,19 @@ import CloudMesh from './CloudMesh';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
+import CloudMeshNoiseAnimation from './CloudMeshNoiseAnimation';
 
-let renderer, pmremGenerator, envMap, scene, camera, controls, simulation, particles, gui, stats;
+let renderer,
+  pmremGenerator,
+  envMap,
+  scene,
+  camera,
+  controls,
+  simulation,
+  cloudMeshNoiseAnimation,
+  particles,
+  gui,
+  stats;
 const raycaster = new THREE.Raycaster();
 
 export function ParticlesCloud() {
@@ -43,26 +54,22 @@ function hdrLoaded() {
   controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
 
-  const simSize = 64;
+  const simSize = 80;
   simulation = new Simulation(renderer, simSize, simSize);
   simulation.addEventListener('change', () => {
-    if (particles.material.uniforms) {
-      particles.material.uniforms.sim.value = simulation.targets[simulation.targetPos].texture;
-      particles.depthMat.uniforms.sim.value = simulation.targets[simulation.targetPos].texture;
-    }
+    cloudMeshNoiseAnimation.shader.uniforms.textureSource.value = simulation.currentRenderTarget.texture;
   });
 
-  particles = new CloudMesh({
-    simulation,
-    envMap,
-  });
+  cloudMeshNoiseAnimation = new CloudMeshNoiseAnimation(renderer, simulation.currentRenderTarget.texture);
+
+  particles = new CloudMesh(cloudMeshNoiseAnimation.renderTarget.texture, envMap);
   particles.mesh.raycastOffsetBuffer = new Float32Array(
-    simulation.currentRenderTarget.width * simulation.currentRenderTarget.height * 4
+    cloudMeshNoiseAnimation.renderTarget.width * cloudMeshNoiseAnimation.renderTarget.height * 4
   );
 
   scene.add(particles.mesh);
 
-  const hemiLight = new THREE.HemisphereLight(0xffffff, bgColor, 0.33);
+  const hemiLight = new THREE.HemisphereLight(0xffffff, bgColor, 0.5);
   hemiLight.position.set(0, 200, 0);
   scene.add(hemiLight);
 
@@ -87,23 +94,25 @@ function hdrLoaded() {
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -20;
   floor.receiveShadow = true;
-  // scene.add(floor);
+  scene.add(floor);
 
   // gui
   gui = new GUI();
+  gui.close();
   const simulationFolder = gui.addFolder('Cloud');
   simulation.GUI(simulationFolder);
   const animationFolder = gui.addFolder('Animation');
-  particles.GUI(animationFolder);
+  cloudMeshNoiseAnimation.GUI(animationFolder);
   const lightsFolder = gui.addFolder('lights');
   lightsFolder.add(hemiLight, 'intensity', 0, 1, 0.01).name('hemi');
   lightsFolder.add(dirLight, 'intensity', 0, 1, 0.01).name('directional');
+  lightsFolder.close();
 
   window.addEventListener('resize', onWindowResize, false);
 
   onWindowResize();
 
-  renderer.domElement.addEventListener('click', clickHandler);
+  renderer.domElement.addEventListener('mousemove', clickHandler);
 
   stats = new Stats();
   document.body.appendChild(stats.dom);
@@ -129,15 +138,24 @@ function clickHandler(event) {
 
   raycaster.setFromCamera(mouse, camera);
 
+  renderer.readRenderTargetPixels(
+    cloudMeshNoiseAnimation.renderTarget,
+    0,
+    0,
+    cloudMeshNoiseAnimation.renderTarget.width,
+    cloudMeshNoiseAnimation.renderTarget.height,
+    particles.mesh.raycastOffsetBuffer
+  );
   const intersection = raycaster.intersectObject(particles.mesh);
-
   if (intersection.length > 0) {
     const instanceId = intersection[0].instanceId;
+    console.log('instanceId', instanceId);
   }
 }
 
 function animate(time) {
-  particles.noiseUniforms.time.value = time / 1000;
+  cloudMeshNoiseAnimation.textureSource.value = simulation.currentRenderTarget.texture;
+  cloudMeshNoiseAnimation.render(time / 1000);
 
   renderer.setRenderTarget(null);
   renderer.render(scene, camera);
