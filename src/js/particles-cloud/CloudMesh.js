@@ -76,5 +76,10 @@ export default class CloudMesh {
     this.mesh = mesh;
   }
 
-  GUI(gui) {}
+  GUI(gui) {
+    gui.add(this.material, 'roughness', 0, 1, 0.001);
+    gui.add(this.material, 'metalness', 0, 1, 0.001);
+    gui.add(this.mesh, 'castShadow');
+    gui.add(this.mesh, 'receiveShadow');
+  }
 }
