@@ -121,16 +121,27 @@ function hdrLoaded() {
   floor.receiveShadow = true;
   scene.add(floor);
 
-  // gui
+  gui;
   gui = new GUI();
-
   gui.close();
-  const simulationFolder = gui.addFolder('Cloud');
-  simulation.GUI(simulationFolder);
   const materialFolder = gui.addFolder('Material');
   particles.GUI(materialFolder);
+
+  const dofFolder = gui.addFolder('DOF');
+  dofFolder.add(postprocessing, 'enabled').name('enabled');
+  dofFolder.add(effectController, 'focus', 0, 100, 1).onChange(matChanger);
+  dofFolder.add(effectController, 'aperture', 0, 200, 0.1).onChange(matChanger);
+  dofFolder.add(effectController, 'maxblur', 0.0, 0.2, 0.0001).onChange(matChanger);
+  dofFolder.add(effectController, 'autofocus', 0.0, 0.1, 0.001).name('Auto-focus');
+
+  const simulationFolder = gui.addFolder('Cloud');
+  simulationFolder.close();
+  simulation.GUI(simulationFolder);
+
   const animationFolder = gui.addFolder('Animation');
+  animationFolder.close();
   cloudMeshNoiseAnimation.GUI(animationFolder);
+
   const lightsFolder = gui.addFolder('lights');
   lightsFolder.add(hemiLight, 'intensity', 0, 1, 0.01).name('hemi');
   lightsFolder.add(dirLight, 'intensity', 0, 1, 0.01).name('directional');
@@ -179,13 +190,6 @@ function initPostprocessing() {
 
   postprocessing.composer = composer;
   postprocessing.bokeh = bokehPass;
-
-  const dofFolder = gui.addFolder('DOF');
-  dofFolder.add(postprocessing, 'enabled').name('enabled');
-  dofFolder.add(effectController, 'focus', 0, 100, 1).onChange(matChanger);
-  dofFolder.add(effectController, 'aperture', 0, 200, 0.1).onChange(matChanger);
-  dofFolder.add(effectController, 'maxblur', 0.0, 0.2, 0.0001).onChange(matChanger);
-  dofFolder.add(effectController, 'autofocus', 0.0, 0.1, 0.001).name('Auto-focus');
 
   matChanger();
 }
