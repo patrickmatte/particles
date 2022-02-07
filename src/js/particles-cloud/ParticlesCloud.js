@@ -79,7 +79,7 @@ function hdrLoaded() {
   controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
 
-  const simSize = 80;
+  const simSize = 96;
   simulation = new Simulation(renderer, simSize, simSize);
   simulation.addEventListener('change', () => {
     cloudMeshNoiseAnimation.shader.uniforms.textureSource.value = simulation.currentRenderTarget.texture;
@@ -124,6 +124,8 @@ function hdrLoaded() {
   gui;
   gui = new GUI();
   gui.close();
+  gui.add(renderer.shadowMap, 'enabled').name('Shadows');
+
   const materialFolder = gui.addFolder('Material');
   particles.GUI(materialFolder);
 

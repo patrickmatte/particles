@@ -121,8 +121,8 @@ export default class CloudMesh {
     this.depthMat = new CloudMeshDepthMaterial(this.textureSource);
 
     const mesh = new InstancedMeshExtended(geometry, this.materials[this.settings.material], maxCount);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
     mesh.count = maxCount;
     mesh.frustumCulled = false;
     mesh.customDepthMaterial = this.depthMat;
