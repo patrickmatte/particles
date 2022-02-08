@@ -225,14 +225,6 @@ function clickHandler(event) {
 
   raycaster.setFromCamera(mouse, camera);
 
-  renderer.readRenderTargetPixels(
-    cloudMeshNoiseAnimation.renderTarget,
-    0,
-    0,
-    cloudMeshNoiseAnimation.renderTarget.width,
-    cloudMeshNoiseAnimation.renderTarget.height,
-    particles.mesh.raycastOffsetBuffer
-  );
   const intersection = raycaster.intersectObject(particles.mesh);
   if (intersection.length > 0) {
     const instanceId = intersection[0].instanceId;
@@ -262,6 +254,15 @@ function animate(time) {
   } else {
     renderer.render(scene, camera);
   }
+
+  renderer.readRenderTargetPixels(
+    cloudMeshNoiseAnimation.renderTarget,
+    0,
+    0,
+    cloudMeshNoiseAnimation.renderTarget.width,
+    cloudMeshNoiseAnimation.renderTarget.height,
+    particles.mesh.raycastOffsetBuffer
+  );
 
   requestAnimationFrame(animate);
   stats.update();
