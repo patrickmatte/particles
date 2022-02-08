@@ -5,5 +5,6 @@ import { ParticlesCloud } from './particles-cloud/ParticlesCloud';
 import { DataTest } from './datatest/DataTest';
 import { RayCast } from './raycast/RayCast';
 import { Demo1 } from './demo1/Demo1';
+import { Demo2 } from './demo2/Demo2';
 
-const exports = [Cloud, PointsMain, InstancedMeshMain, ParticlesCloud, DataTest, RayCast, Demo1];
+const exports = [Cloud, PointsMain, InstancedMeshMain, ParticlesCloud, DataTest, RayCast, Demo1, Demo2];
