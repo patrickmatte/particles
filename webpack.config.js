@@ -32,6 +32,19 @@ module.exports = (env, argv) => {
   const htmlFiles = [
     {
       template: pageTemplate,
+      title: 'demo1',
+      filename: 'demo1.html',
+      class: 'demo demo1',
+      head: ``,
+      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
+      body: `
+        <script>
+          window.Demo1();
+        </script>
+      `,
+    },
+    {
+      template: pageTemplate,
       title: 'particles cloud',
       filename: 'particles-cloud.html',
       class: 'particles cloud',

@@ -28,6 +28,18 @@ export function localToGlobal3d(element, root, point = new THREE.Vector3(), debu
   return point;
 }
 
+export function getTriangleCenter(triangle) {
+  var vectorA = triangle.a;
+  var vectorB = triangle.b;
+  var vectorC = triangle.c;
+
+  var centerX = (vectorA[0] + vectorB[0] + vectorC[0]) / 3;
+  var centerY = (vectorA[1] + vectorB[1] + vectorC[1]) / 3;
+  var centerZ = (vectorA[2] + vectorB[2] + vectorC[2]) / 3;
+
+  return new THREE.Vector3(centerX, centerY, centerZ);
+}
+
 export function randomVector3(range) {
   return new THREE.Vector3(randomRange(-range, range), randomRange(-range, range), randomRange(-range, range));
 }
