@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import CloudMeshDepthMaterial from './CloudMeshDepthMaterial';
 import { InstancedMeshExtended } from './InstancedMeshExtended';
-import { glsl } from '../tsunami/three/threeUtils';
-import { searchData } from './Data';
+import { glsl } from '../../tsunami/three/threeUtils';
+import { searchData } from '../model/Data';
 
 export default class CloudMesh {
   constructor(textureSource) {

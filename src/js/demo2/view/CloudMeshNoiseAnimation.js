@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import noise from '../tsunami/three/shaders/noise.glsl';
-import curlNoise from '../tsunami/three/shaders/curlNoise.glsl';
-import { glsl } from '../tsunami/three/threeUtils';
+import noise from '../../tsunami/three/shaders/noise.glsl';
+import curlNoise from '../../tsunami/three/shaders/curlNoise.glsl';
+import { glsl } from '../../tsunami/three/threeUtils';
 
 export default class CloudMeshNoiseAnimation {
   constructor(renderer, textureSource) {

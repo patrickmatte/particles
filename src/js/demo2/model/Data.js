@@ -1,4 +1,4 @@
-import csv from '../../../build/assets/dataset.csv';
+import csv from '../../../../build/assets/dataset.csv';
 import { shuffleArray } from '../../tsunami/utils/array';
 
 const meaningFullCategories = [];

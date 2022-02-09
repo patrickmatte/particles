@@ -1,17 +1,17 @@
 import * as THREE from 'three';
-import Simulation from '../../demo1/Simulation';
+import Simulation from '../../demo2/view/Simulation';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
-import CloudMesh from '../../demo1/CloudMesh';
+import CloudMesh from '../../demo2/view/CloudMesh';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'lil-gui';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
-import CloudMeshNoiseAnimation from '../../demo1/CloudMeshNoiseAnimation';
+import CloudMeshNoiseAnimation from '../../demo2/view/CloudMeshNoiseAnimation';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { BokehPass } from '../../demo1/BokehPass.js';
+import { BokehPass } from '../../demo2/view/BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
-import { searchData } from '../../demo1/Data';
+import { searchData } from '../../demo2/model/Data';
 
 export default class Stage {
   constructor() {
@@ -22,7 +22,7 @@ export default class Stage {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(this.renderer.domElement);
+    this.element = this.renderer.domElement;
     this.renderer.shadowMap.enabled = true;
 
     this.composer = new EffectComposer(this.renderer);
@@ -36,7 +36,7 @@ export default class Stage {
 
     this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight);
     // this.camera.position.x = 30;
-    this.camera.position.z = 40;
+    this.camera.position.z = 48;
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.update();
@@ -59,11 +59,8 @@ export default class Stage {
     this.dirLight = dirLight;
     this.scene.add(dirLight);
 
-    const isAppleDevice = navigator.userAgent.match(/iPhone|iPad|iPod/i);
-    const floatType = isAppleDevice ? THREE.HalfFloatType : THREE.FloatType;
-
     this.effectController = {
-      focus: 30.0,
+      focus: 35,
       aperture: 0.001,
       maxblur: 0.02,
       autofocus: false,
@@ -89,11 +86,11 @@ export default class Stage {
     );
     this.scene.add(this.particles.mesh);
 
-    this.selectedCategory = new CloudMesh(this.cloudMeshNoiseAnimation.renderTarget.texture);
-    this.selectedCategory.mesh.raycastOffsetBuffer = new Float32Array(
-      this.cloudMeshNoiseAnimation.renderTarget.width * this.cloudMeshNoiseAnimation.renderTarget.height * 4
-    );
-    this.scene.add(this.selectedCategory.mesh);
+    // this.selectedCategory = new SelectedCategory(this.cloudMeshNoiseAnimation.renderTarget.texture);
+    // this.selectedCategory.mesh.raycastOffsetBuffer = new Float32Array(
+    //   this.cloudMeshNoiseAnimation.renderTarget.width * this.cloudMeshNoiseAnimation.renderTarget.height * 4
+    // );
+    // this.scene.add(this.selectedCategory.mesh);
 
     // floor
     // const floor = new THREE.Mesh(
@@ -121,8 +118,17 @@ export default class Stage {
 
     this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
     this.pmremGenerator.compileEquirectangularShader();
-    new RGBELoader().setDataType(floatType).load(`assets/studio_small_03_1k.hdr`, (t) => {
-      this.envMap = this.pmremGenerator.fromEquirectangular(t).texture;
+  }
+
+  load() {
+    const isAppleDevice = navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    const floatType = isAppleDevice ? THREE.HalfFloatType : THREE.FloatType;
+
+    return new Promise((success, reject) => {
+      new RGBELoader().setDataType(floatType).load(`assets/studio_small_03_1k.hdr`, (t) => {
+        this.envMap = this.pmremGenerator.fromEquirectangular(t).texture;
+        success();
+      });
     });
   }
 
@@ -130,6 +136,8 @@ export default class Stage {
     this.gui;
     this.gui = new GUI();
     this.gui.close();
+
+    this.gui.add(this.camera.position, 'z', 0, 100, 1);
 
     const materialFolder = this.gui.addFolder('Material');
     this.particles.GUI(materialFolder);

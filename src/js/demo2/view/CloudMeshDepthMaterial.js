@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { glsl } from '../tsunami/three/threeUtils';
+import { glsl } from '../../tsunami/three/threeUtils';
 
 export default class CloudMeshDepthMaterial extends THREE.ShaderMaterial {
   constructor(textureSource, pointScale) {
