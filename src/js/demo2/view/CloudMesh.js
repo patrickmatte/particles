@@ -5,7 +5,7 @@ import { glsl } from '../tsunami/three/threeUtils';
 import { searchData } from './Data';
 
 export default class CloudMesh {
-  constructor(textureSource, envMap) {
+  constructor(textureSource) {
     this.textureSource = { value: textureSource };
 
     this.settings = {
@@ -88,8 +88,6 @@ export default class CloudMesh {
       roughness: 0.4,
       metalness: 0,
       color: 0xff0000,
-      envMap,
-      envMapIntensity: 0.01,
       transparent: true,
     });
     this.materials.basic = new THREE.MeshBasicMaterial({
@@ -181,7 +179,7 @@ export default class CloudMesh {
         this.materialFolder = gui.addFolder('Material');
         this.materialFolder.add(material, 'roughness', 0, 1, 0.001);
         this.materialFolder.add(material, 'metalness', 0, 1, 0.001);
-        this.materialFolder.add(material, 'envMapIntensity', 0, 1, 0.001);
+        // this.materialFolder.add(material, 'envMapIntensity', 0, 1, 0.001);
       }
     });
     gui.add(this.settings.pointScale, 'value', 0, 5, 0.001).name('pointScale');

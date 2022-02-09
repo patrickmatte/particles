@@ -19,7 +19,6 @@ let renderer,
   pmremGenerator,
   envMap,
   scene,
-  bokehScene,
   camera,
   controls,
   simulation,
@@ -72,8 +71,6 @@ function hdrLoaded() {
   scene = new THREE.Scene();
   scene.background = bgColor;
   scene.fog = new THREE.Fog(bgColor, 0, 125);
-
-  bokehScene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight);
   // camera.position.x = 30;
