@@ -11,7 +11,8 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { BokehPass } from '../../demo2/view/BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
-import { searchData } from '../../demo2/model/Data';
+import { searchData } from '../model/Data';
+import CategoryMesh from './CategoryMesh';
 
 export default class Stage {
   constructor() {
@@ -86,11 +87,14 @@ export default class Stage {
     );
     this.scene.add(this.particles.mesh);
 
-    // this.selectedCategory = new SelectedCategory(this.cloudMeshNoiseAnimation.renderTarget.texture);
-    // this.selectedCategory.mesh.raycastOffsetBuffer = new Float32Array(
+    this.categoryMesh = new CategoryMesh(
+      this.cloudMeshNoiseAnimation.renderTarget.texture,
+      this.particles.geometry.attributes.textureUV.array
+    );
+    // this.categoryMesh.mesh.raycastOffsetBuffer = new Float32Array(
     //   this.cloudMeshNoiseAnimation.renderTarget.width * this.cloudMeshNoiseAnimation.renderTarget.height * 4
     // );
-    // this.scene.add(this.selectedCategory.mesh);
+    this.scene.add(this.categoryMesh.mesh);
 
     // floor
     // const floor = new THREE.Mesh(

@@ -1,4 +1,4 @@
-import csv from '../../../build/assets/dataset.csv';
+import csv from '../dataset.csv';
 
 export function DataTest() {
   const meaningFullCategories = [];

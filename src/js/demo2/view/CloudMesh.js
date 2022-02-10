@@ -14,6 +14,7 @@ export default class CloudMesh {
     };
 
     const geometry = new THREE.IcosahedronBufferGeometry(0.25, 2);
+    this.geometry = geometry;
 
     this.colorRandomMultiplier = { value: new THREE.Vector3(0.25, 0.25, 0.25) };
 
@@ -58,7 +59,9 @@ export default class CloudMesh {
       }
     }
 
+    let entryCount = 0;
     searchData.Categories.forEach((cat, k) => {
+      cat.meshIndex = { start: entryCount, end: entryCount };
       cat.AllEntries.forEach((entry) => {
         const factor = k / (searchData.Categories.length - 1);
         const color = colors[Math.floor(factor * (colors.length - 1))];
@@ -68,6 +71,8 @@ export default class CloudMesh {
         instanceColor.push(color.b);
 
         visibility.push(1);
+        cat.meshIndex.end = entryCount;
+        entryCount++;
       });
     });
 
