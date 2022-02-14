@@ -36,6 +36,7 @@ export default class TreeMesh {
     const treePos = [];
 
     let maxCount = 0;
+    this.balls = [];
     searchData.Categories.forEach((mainCategory, k) => {
       const mainCategoryFactor = k / (searchData.Categories.length - 1);
       const mainCategoryRotationFactor = k / searchData.Categories.length;
@@ -52,13 +53,18 @@ export default class TreeMesh {
         let position = Vector3D.spherePoint(radius, catRotation.x, catRotation.y);
         treePos.push(position.x, position.y, position.z);
 
-        instanceColor.push(color.r);
-        instanceColor.push(color.g);
-        instanceColor.push(color.b);
+        // instanceColor.push(color.r);
+        // instanceColor.push(color.g);
+        // instanceColor.push(color.b);
+        instanceColor.push(0);
+        instanceColor.push(0);
+        instanceColor.push(0);
 
         randomColor.push(Math.random());
         randomColor.push(Math.random());
         randomColor.push(Math.random());
+
+        this.balls.push(cat);
         maxCount++;
 
         if (cat.Entries) {
@@ -78,6 +84,8 @@ export default class TreeMesh {
             randomColor.push(Math.random());
             randomColor.push(Math.random());
             randomColor.push(Math.random());
+
+            this.balls.push(entry);
             maxCount++;
           });
         }
@@ -89,8 +97,6 @@ export default class TreeMesh {
       };
       recurseCategory(mainCategory, color, rotation, 1, true);
     });
-
-    console.log('maxCount', maxCount);
 
     geometry.setAttribute('instanceColor', new THREE.InstancedBufferAttribute(new Float32Array(instanceColor), 3));
     geometry.setAttribute('randomColor', new THREE.InstancedBufferAttribute(new Float32Array(randomColor), 3));

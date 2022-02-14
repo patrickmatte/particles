@@ -76,6 +76,7 @@ export default class Tween extends EventTarget {
   tick(event) {
     const currentTime = this.clock.time;
     this.time += (currentTime - this.previousTime) / 1000;
+
     this.previousTime = currentTime;
   }
 

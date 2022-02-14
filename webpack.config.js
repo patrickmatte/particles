@@ -32,6 +32,19 @@ module.exports = (env, argv) => {
   const htmlFiles = [
     {
       template: pageTemplate,
+      title: 'branches',
+      filename: 'branches.html',
+      class: 'branches',
+      head: ``,
+      oldhead: `<link href="./assets/fonts/fonts.css" rel="stylesheet">`,
+      body: `
+        <script>
+          window.Branches();
+        </script>
+      `,
+    },
+    {
+      template: pageTemplate,
       title: 'tree',
       filename: 'tree.html',
       class: 'tree',
