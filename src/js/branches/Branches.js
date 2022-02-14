@@ -236,11 +236,9 @@ function clickHandler(event) {
 
   const intersection = raycaster.intersectObjects(objects);
   if (intersection.length > 0) {
-    console.log(intersection[0]);
     const selectedSegment = segments.find((segment) => {
       return segment.endingMesh == intersection[0].object;
     });
-    console.log(selectedSegment);
     const newBranch = new TreeBranch(
       selectedSegment.start,
       selectedSegment.direction,
