@@ -10,6 +10,11 @@ import { BokehPass } from './BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
 import TreeBranch from './TreeBranch';
+import Tween from '../tsunami/animation/Tween';
+import TweenProperty from '../tsunami/animation/TweenProperty';
+import Easing from '../tsunami/animation/Easing';
+import Vector3D from '../tsunami/geom/Vector3D';
+import Point from '../tsunami/geom/Point';
 
 let renderer,
   composer,
@@ -23,7 +28,9 @@ let renderer,
   stats,
   hemiLight,
   dirLight,
-  branches;
+  branches,
+  cameraTween,
+  cameraAngleY;
 
 const raycaster = new THREE.Raycaster();
 
@@ -177,13 +184,10 @@ function createGUI() {
   // const materialFolder = gui.addFolder('Material');
   // particles.GUI(materialFolder);
 
-  gui.add(effectController, 'animationProgress', 0, 1).onChange((value) => {
-    branches.forEach((branch, i) => {
-      branch.progress = value;
-    });
-  });
-  // branches.forEach((branch, i) => {
-  //   branch.GUI(gui.addFolder('branch' + i));
+  // gui.add(effectController, 'animationProgress', 0, 1).onChange((value) => {
+  //   branches.forEach((branch, i) => {
+  //     branch.progress = value;
+  //   });
   // });
 
   const dofFolder = gui.addFolder('Depth of field');
@@ -240,7 +244,7 @@ function clickHandler(event) {
       return segment.endingMesh == intersection[0].object;
     });
     const newBranch = new TreeBranch(
-      selectedSegment.start,
+      selectedSegment.end,
       selectedSegment.direction,
       10,
       5,
@@ -251,6 +255,30 @@ function clickHandler(event) {
     selectedSegment.parentBranch.add(newBranch);
     newBranch.show();
 
+    const currentAngleY = Point.getAngle(new Point(camera.position.x, camera.position.z));
+
+    const newCenter = newBranch.segments[2].start;
+
+    const newPosition = Vector3D.spherePoint(30, 0, currentAngleY);
+    newPosition.add(newBranch.segments[2].start);
+
+    if (cameraTween) cameraTween.stop();
+    const ease = Easing.cubic.easeInOut;
+    cameraTween = new Tween(
+      0,
+      2,
+      [
+        new TweenProperty(camera.position, 'x', camera.position.x, newPosition.x, ease),
+        new TweenProperty(camera.position, 'y', camera.position.y, newPosition.y, ease),
+        new TweenProperty(camera.position, 'z', camera.position.z, newPosition.z, ease),
+        new TweenProperty(controls.target, 'x', controls.target.x, newCenter.x, ease),
+        new TweenProperty(controls.target, 'y', controls.target.y, newCenter.y, ease),
+        new TweenProperty(controls.target, 'z', controls.target.z, newCenter.z, ease),
+      ],
+      controls.update.bind(controls)
+    );
+    cameraTween.start();
+
     // const instanceId = intersection[0].instanceId;
     // const selecteEntry = searchData.allEntries[instanceId];
     // const diff = intersection[0].point.subVectors(camera.position, intersection[0].point);
@@ -259,6 +287,8 @@ function clickHandler(event) {
     // selectedCategoryId = instanceId;
   }
 }
+
+function setCameraAngleY(value) {}
 
 function animate(time) {
   // renderer.setRenderTarget(null);
