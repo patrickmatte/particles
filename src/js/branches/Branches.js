@@ -95,10 +95,9 @@ export function Branches() {
   dirLight.shadow.mapSize.width = 2048;
   dirLight.shadow.mapSize.height = 2048;
   // light.shadow.camera.far = 20;
-
   scene.add(dirLight);
 
-  // // floor
+  // floor
   // const floor = new THREE.Mesh(
   //   new THREE.PlaneGeometry(500, 500),
   //   new THREE.MeshStandardMaterial({ color: bgColor, depthWrite: false })
@@ -203,7 +202,7 @@ function createGUI() {
   // fogFolder.add(scene.fog, 'near', 0, 500, 0.01);
   // fogFolder.add(scene.fog, 'far', 0, 500, 0.01);
 
-  const lightsFolder = gui.addFolder('lights');
+  const lightsFolder = gui.addFolder('Lights');
   lightsFolder.close();
   lightsFolder.add(hemiLight, 'intensity', 0, 1, 0.01).name('hemi');
   lightsFolder.add(dirLight, 'intensity', 0, 1, 0.01).name('directional');
